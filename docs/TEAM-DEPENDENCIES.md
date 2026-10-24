@@ -1,0 +1,16 @@
+# Team dependencies
+All dates below are suggested handoff milestones within the existing schedule, not new assignments. No messages have been sent to teammates. Arjun's tracker remains the source of task ownership and approved changes; this document is a dependency register only.
+
+| Owner | Needed | Suggested milestone / current blocker |
+|---|---|---|
+| Olivia Chevalier — Project Lead | Final V1 scope, technical approach approval, hosting/domain arrangement, major scope-change approval, final publication approval | Scope/approach Nov 2; hosting Nov 8; publication by Dec 6. All pending. |
+| Arjun Vijapurapu — Operations | Shared task tracker location, milestones, ownership/deadlines, blocker reporting process, approved scope-change record | Nov 2. Pending; do not create a competing tracker. |
+| Shreevidya Shashikanth — UI/UX & Testing | Student journey, essential pages/navigation, wireframes, mobile requirements, accessibility expectations, search/detail interactions, testing checklist | Nov 8 for prototype; acceptance checklist Nov 22. Pending; coordinate directly before final page behavior. |
+| Anna Luisa Gonzalez — Visual Design | Palette, typography, spacing/layout, scholarship card designs, homepage direction, graphics/assets, responsive specs | Nov 8 initial direction; Nov 15 handoff. Pending; current UI neutral and flexible. |
+| Jeet Patel — Market Research | Student pain points, platform findings, recommended filters, priority audiences, understandable terminology, feedback requirements | Nov 8. Pending; advanced filters blocked. |
+| Avanthi Mudipalli — Scholarship Research | Final spreadsheet, required/optional fields, first verified batch, official provider URLs, eligibility, awards, deadlines, last-verified dates, expired/uncertain handling process | Columns Nov 8; first batch Nov 15; current batch Nov 22. Pending; public dataset stays empty. Avanthi owns verification. |
+| Natalie Laughlin — Advertising & Outreach | Launch website requirements, promotional channels, link-sharing needs, approved tracking requirements | Nov 15 requirements; Nov 29 launch readiness. Pending; no third-party tracking added. |
+| Ashrin Arisha — Social Media & Content | Approved public project description, launch messaging, approved content/branding | Nov 15 copy; Nov 29 launch messaging. Pending; current copy provisional. |
+| Ave Borha — Product Strategy, if participating | Competitor analysis, feasible improvements, prioritized recommendations | Nov 8 if participating. Optional proposals require scope review, not automatic implementation. |
+
+Aayush should ask each owner directly about their workstream; Olivia need not relay routine technical questions. Report blockers through Arjun's agreed process once supplied.
