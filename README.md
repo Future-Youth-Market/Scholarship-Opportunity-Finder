@@ -1,9 +1,11 @@
 # FYM Scholarship Opportunity Finder
+
 Student-led scholarship discovery platform built by Future Youth Market.
 
 Phase 0 foundation prepared October 24, 2026 under explicit authorization. Official project timeline: October 26–December 6. This is not an official Week 1 Technical Lead assignment.
 
 ## Quick start
+
 Use Node 24.14.1 (see `.nvmrc`) and npm. Run `npm ci`, then `npm run dev`. Open the local URL printed by Vite.
 
 - `npm run check`: public data validation, TypeScript, ESLint, Vitest, production build.
@@ -17,6 +19,7 @@ React, TypeScript, Vite, Tailwind; local JSON; no accounts, backend, API keys, r
 The responsive neutral shell includes accessible navigation, search by scholarship/provider, typed cards, and empty states. Public data is intentionally empty. Final filters, detail pages, branding, research content, and publication await team input. No production deployment has been made.
 
 ## Documentation
+
 - [Architecture](docs/ARCHITECTURE.md)
 - [Team dependencies](docs/TEAM-DEPENDENCIES.md)
 - [Open decisions](docs/OPEN-DECISIONS.md)

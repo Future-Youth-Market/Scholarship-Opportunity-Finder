@@ -1,1 +1,22 @@
-export function SearchInput({ value, onChange }: { value: string; onChange: (value: string) => void }) { return <div><label className="block font-semibold" htmlFor="scholarship-search">Search by scholarship or provider name</label><input className="mt-2 w-full rounded border border-slate-500 p-3" id="scholarship-search" type="search" value={value} onChange={event => onChange(event.target.value)} /></div> }
+export function SearchInput({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div>
+      <label className="block font-semibold" htmlFor="scholarship-search">
+        Search by scholarship or provider name
+      </label>
+      <input
+        className="mt-2 w-full rounded border border-slate-500 p-3"
+        id="scholarship-search"
+        type="search"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      />
+    </div>
+  );
+}

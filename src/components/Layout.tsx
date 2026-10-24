@@ -1,4 +1,35 @@
-import type { ReactNode } from 'react'
-export function PageContainer({ children }: { children: ReactNode }) { return <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">{children}</div> }
-export function Header() { return <header className="border-b py-5"><PageContainer><a className="skip-link" href="#main">Skip to content</a><p className="font-semibold">Future Youth Market (FYM)</p><nav aria-label="Main navigation" className="mt-3 flex flex-wrap gap-5"><a href="#about">About the finder</a><a href="#opportunities">Scholarship opportunities</a></nav></PageContainer></header> }
-export function Footer() { return <footer className="mt-12 border-t py-6"><PageContainer><p>Future Youth Market · Scholarship Opportunity Finder</p><p className="mt-2">Students apply through official providers. FYM does not process applications or guarantee eligibility or awards.</p></PageContainer></footer> }
+import type { ReactNode } from "react";
+export function PageContainer({ children }: { children: ReactNode }) {
+  return (
+    <div className="mx-auto w-full max-w-5xl px-5 sm:px-8">{children}</div>
+  );
+}
+export function Header() {
+  return (
+    <header className="border-b py-5">
+      <PageContainer>
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
+        <p className="font-semibold">Future Youth Market (FYM)</p>
+        <nav aria-label="Main navigation" className="mt-3 flex flex-wrap gap-5">
+          <a href="#about">About the finder</a>
+          <a href="#opportunities">Scholarship opportunities</a>
+        </nav>
+      </PageContainer>
+    </header>
+  );
+}
+export function Footer() {
+  return (
+    <footer className="mt-12 border-t py-6">
+      <PageContainer>
+        <p>Future Youth Market · Scholarship Opportunity Finder</p>
+        <p className="mt-2">
+          Students apply through official providers. FYM does not process
+          applications or guarantee eligibility or awards.
+        </p>
+      </PageContainer>
+    </footer>
+  );
+}
