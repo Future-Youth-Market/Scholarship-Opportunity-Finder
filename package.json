@@ -4,20 +4,27 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "vite --host 127.0.0.1",
+    "build": "npm run validate:data && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "typecheck": "tsc -b",
     "test": "vitest run",
     "import:data": "node scripts/import-scholarships.ts",
     "validate:data": "node scripts/check-data.ts",
-    "check": "npm run validate:data && npm run typecheck && npm run lint && npm test && npm run build"
+    "check": "npm run validate:data && npm run typecheck && npm run lint && npm test && npm run build",
+    "review:data": "node scripts/review-data.ts",
+    "generate:data": "node scripts/publish-data.ts"
   },
   "dependencies": {
+    "@fontsource/barlow-condensed": "^5.3.0",
+    "@fontsource/open-sauce-one": "^5.3.0",
     "csv-parse": "^7.0.3",
+    "fflate": "^0.8.3",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "react-router": "^8.5.1",
+    "read-excel-file": "^9.3.14"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -40,5 +47,8 @@
   },
   "engines": {
     "node": ">=24.14.0 <25"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1"
   }
 }

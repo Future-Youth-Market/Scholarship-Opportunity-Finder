@@ -1,23 +1,24 @@
-# Deployment readiness — no deployment performed
+# Netlify deployment — approval required
 
-## Local preview
+No hosting connection, domain/DNS change or production publication was performed. Local development is the only preview of pending research.
 
-Use Node 24.14.1. Run `npm ci`, `npm run check`, then `npm run preview -- --host 127.0.0.1`. Open the printed localhost URL. This requires no hosting account and is the current default preview.
+## Local previews
 
-## Netlify connection, after hosting approval
+- `npm run dev`: private research preview on 127.0.0.1. Do not expose it on a public host or tunnel. Import private research first for 13 local records; another clone has none until an authorized import.
+- `npm run build` followed by `npm run preview`: production-equivalent preview with approved data only. Currently shows a truthful empty directory because no research is approved.
 
-1. Olivia confirms the intended account, domain arrangement and who may publish. Use the Free plan; do not add billing upgrades, DNS changes, paid services or analytics.
-2. An authorized repository owner connects the existing Future-Youth-Market/Scholarship-Opportunity-Finder GitHub repository to Netlify. Grant only necessary repository access; do not change organization permissions without authorization.
-3. Verify `netlify.toml`: build `npm run check`, publish `dist`, Node 24.14.1; dependency installation uses the committed lockfile. No secrets/environment variables are needed.
-4. Connecting a repository may trigger a production deploy. Until publication is approved, keep work local. Before authorizing any connection/import, verify the current Netlify UI's controls for preventing automatic production publishing; do not assume a new project is private or harmless. Stop if a nonproduction setup cannot be assured.
-5. Once authorized, enable PR Deploy Previews for the foundation branch, confirm production remains gated, and review the generated preview URL. Preview links may be publicly reachable: use approved content only. No custom domain is needed for review.
-6. Test preview keyboard navigation, narrow-screen layout, search, empty states, source links and the displayed verification dates. Olivia grants final publication approval before the approved branch is published. Never merge into an automatically deploying production branch before that approval.
-7. After approval, publish the reviewed commit and check the live URL. Record release SHA and approval. For rollback, use the last approved deploy or reviewed Git revert; inspect data freshness before republishing.
+## Netlify Deploy Preview
 
-Single-page anchor navigation needs no SPA rewrite. Add routing/fallback only if multiple pages are approved.
+1. Confirm hosting/account/branch arrangement with Olivia and the existing organization owner. Use the existing GitHub repository; no duplicate repositories.
+2. Check the current Netlify Free plan terms and account usage. Use the Free plan only; do not select paid add-ons, seats, analytics or billing upgrades.
+3. Repository connection/import may trigger an initial production deployment. Do not connect or merge to a production-connected branch without authorization. Arrange production publishing controls with the account owner before connection; if this cannot be assured, stay with local preview.
+4. After authorization, configure base as repository root, build as `npm run check`, publish as `dist`, Node 24.14.1. Commit package-lock.json and use npm's lockfile installation. No credentials or environment variables are needed by the application.
+5. Enable PR Deploy Previews on the approved feature branch. They use the same approved-only build as production. There is deliberately no environment switch to include pending research in public preview builds. Preview links may be public. Share only approved content and never upload source exports/reports.
+6. Inspect `/`, `/scholarships`, a published `/scholarships/:id`, and a refreshed deep link. `netlify.toml` rewrites client routes to index.html. Unknown IDs show a not-found page. Validate provider links and keyboard/mobile behavior.
+7. Obtain Olivia's final publication approval before production publish/merge. Record the approved SHA and decision in the shared project process. Verify the production URL after release. No DNS changes are implied.
 
-## Free-tier operations
+## Budget and maintenance
 
-Checked October 24, 2026: Netlify lists a Free plan with 300 credits per month and one concurrent build. Traffic and production deployments consume shared usage; previews also generate requests. Recheck https://www.netlify.com/pricing/ and https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/billing-faq-for-credit-based-plans/ before connection. Existing accounts may have different legacy terms. Do not assume unlimited bandwidth, deployment frequency, team seats or uptime. Use free reviewer roles where available; do not assume developer collaboration seats are free.
+Netlify's Free plan is metered; do not assume unlimited traffic, deployment usage, preview requests or team seats. The Phase 0 check recorded 300 monthly credits/one concurrent build; recheck https://www.netlify.com/pricing/ and account-specific terms before connecting. Existing/legacy accounts can differ. Do not enable paid capacity or auto-recharge. Monitor usage notifications, batch reviewed updates and agree a response if limits interrupt availability. No forms, functions, database or third-party tracking are required.
 
-Monitor account usage and notifications; batch approved content updates and avoid unnecessary rebuilds. Free hard limits may interrupt service; agree a response with Olivia rather than purchasing upgrades. Avoid forms, serverless functions, databases and additional metered services. GitHub Actions usage also depends on repository/account plan; no Actions workflow is required or configured for Phase 0. Maintainers must run checks before review/merge and enable available branch protections when authorized.
+Production builds validate approved snapshots and matching content hashes even when the private research dataset is absent on Netlify. Only `dist` is deployed, not the repository or ignored local files. Deploy Previews are not a substitute for content approval. Roll back using a previously approved deploy or a reviewed revert of the public JSON **and** its matching review evidence; recheck content freshness.

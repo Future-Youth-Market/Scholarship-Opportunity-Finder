@@ -179,3 +179,9 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Unpublished research and source attachments
+data/private/
+*.xlsm
+*.xlsx
+*.pdf

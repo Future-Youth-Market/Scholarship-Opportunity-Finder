@@ -1,21 +1,21 @@
 export function SearchInput({
   value,
   onChange,
+  id = "scholarship-search",
 }: {
   value: string;
   onChange: (value: string) => void;
+  id?: string;
 }) {
   return (
-    <div>
-      <label className="block font-semibold" htmlFor="scholarship-search">
-        Search by scholarship or provider name
-      </label>
+    <div className="search-field">
+      <label htmlFor={id}>Search scholarships</label>
       <input
-        className="mt-2 w-full rounded border border-slate-500 p-3"
-        id="scholarship-search"
+        id={id}
         type="search"
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Name, organization, or eligibility keyword"
       />
     </div>
   );

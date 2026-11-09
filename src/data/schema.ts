@@ -1,38 +1,37 @@
+export type ReviewStatus = "pending-review" | "approved" | "needs-correction";
 export interface Scholarship {
   id: string;
   name: string;
   provider: string;
   award?: string;
   deadline?: string;
+  deadlineText?: string;
   eligibility?: string;
   restrictions?: string;
   informationUrl: string;
   applicationUrl?: string;
-  lastVerified: string;
+  lastChecked?: string;
+  lastCheckedText?: string;
   notes?: string;
-  categories?: string;
 }
-export const fields = [
-  "id",
-  "name",
-  "provider",
-  "award",
-  "deadline",
-  "eligibility",
-  "restrictions",
-  "informationUrl",
-  "applicationUrl",
-  "lastVerified",
-  "notes",
-  "categories",
-] as const;
-export const required = [
-  "id",
-  "name",
-  "provider",
-  "informationUrl",
-  "lastVerified",
-] as const;
+export interface ResearchRecord {
+  scholarship: Scholarship;
+  contentHash: string;
+  sourceRow: number;
+  warnings: string[];
+  errors: string[];
+}
+export interface ReviewDecision {
+  id: string;
+  contentHash: string;
+  status: ReviewStatus;
+  reviewer: string;
+  reviewedAt: string;
+  note: string;
+}
+export interface Listing extends Scholarship {
+  reviewStatus: ReviewStatus;
+}
 export function isDate(value: string): boolean {
   return (
     /^\d{4}-\d{2}-\d{2}$/.test(value) &&
@@ -47,81 +46,28 @@ export function validUrl(value: string): boolean {
       url.protocol === "https:" &&
       !!url.hostname &&
       !url.username &&
-      !url.password
+      !url.password &&
+      !/\s/.test(value)
     );
   } catch {
     return false;
   }
 }
-export function validateRecords(
-  rows: Record<string, unknown>[],
-  today = new Date().toISOString().slice(0, 10),
-) {
-  const reports: { row: number; errors: string[]; warnings: string[] }[] = [];
-  const valid: Scholarship[] = [];
-  const counts = (key: string) =>
-    rows.reduce((map, row) => {
-      const v = row[key];
-      if (typeof v === "string" && v) map.set(v, (map.get(v) ?? 0) + 1);
-      return map;
-    }, new Map<string, number>());
-  const ids = counts("id");
-  const identities = rows.map(
-    (r) =>
-      `${String(r.name).toLowerCase()}|${String(r.provider).toLowerCase()}`,
-  );
-  rows.forEach((row, index) => {
-    const errors: string[] = [],
-      warnings: string[] = [];
-    for (const key of Object.keys(row))
-      if (
-        ![...fields, "verificationStatus"].includes(
-          key as (typeof fields)[number],
-        )
-      )
-        errors.push(`Unknown column: ${key}`);
-    for (const [key, value] of Object.entries(row))
-      if (typeof value !== "string") errors.push(`${key} must be text`);
-    for (const key of required)
-      if (typeof row[key] !== "string" || !row[key].trim())
-        errors.push(`Missing ${key}`);
-    if (row.verificationStatus !== "verified")
-      errors.push("verificationStatus must be verified");
-    for (const key of ["informationUrl", "applicationUrl"])
-      if (row[key] && !validUrl(String(row[key])))
-        errors.push(`${key} must be an absolute HTTPS URL without credentials`);
-    for (const key of ["deadline", "lastVerified"])
-      if (row[key] && !isDate(String(row[key])))
-        errors.push(`${key} must be a real YYYY-MM-DD date`);
-    if (row.lastVerified && String(row.lastVerified) > today)
-      errors.push("lastVerified is in the future");
-    if (
-      (ids.get(String(row.id)) ?? 0) > 1 ||
-      identities.filter((v) => v === identities[index]).length > 1
-    )
+export function validateScholarship(s: Scholarship): string[] {
+  const errors: string[] = [];
+  for (const key of ["id", "name", "provider", "informationUrl"] as const)
+    if (typeof s[key] !== "string" || !s[key].trim())
+      errors.push(`Missing ${key}`);
+  if (!/^[a-z0-9-]+$/.test(s.id ?? "")) errors.push("ID must be URL-safe");
+  for (const key of ["informationUrl", "applicationUrl"] as const)
+    if (s[key] && !validUrl(s[key]))
       errors.push(
-        "Duplicate ID or scholarship/provider pair; resolve all copies",
+        `${key} must be an absolute HTTPS URL without credentials or whitespace`,
       );
-    for (const key of ["award", "deadline", "eligibility"])
-      if (!row[key]) warnings.push(`${key} unavailable`);
-    if (
-      row.deadline &&
-      isDate(String(row.deadline)) &&
-      String(row.deadline) < today
-    )
-      errors.push("Past deadline: hold for research review");
-    if (
-      row.lastVerified &&
-      isDate(String(row.lastVerified)) &&
-      (Date.parse(today) - Date.parse(String(row.lastVerified))) / 86400000 > 90
-    )
-      errors.push("Verification older than provisional 90-day review window");
-    if (!errors.length) {
-      const result: Record<string, string> = {};
-      for (const key of fields) if (row[key]) result[key] = String(row[key]);
-      valid.push(result as unknown as Scholarship);
-    }
-    reports.push({ row: index + 2, errors, warnings });
-  });
-  return { valid, reports };
+  for (const key of ["deadline", "lastChecked"] as const)
+    if (s[key] && !isDate(s[key]))
+      errors.push(`${key} must be a real YYYY-MM-DD date`);
+  for (const [key, value] of Object.entries(s))
+    if (typeof value !== "string") errors.push(`${key} must be text`);
+  return errors;
 }

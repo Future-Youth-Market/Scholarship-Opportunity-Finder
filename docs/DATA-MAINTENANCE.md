@@ -1,14 +1,31 @@
-# Maintaining listings without editing application code
+# Research updates and content review
 
-Avanthi owns content verification. Google Sheets is the research source of truth; its final template is pending. Keep internal research and unverified rows out of the export intended for publication. No automatic scraping or publishing is configured.
+Avanthi owns source research; Olivia controls publication approval. Last Checked is not a publication decision. No real record was approved automatically.
 
-1. Start with the header-only `data/scholarships-template.csv` in Sheets. Confirm final columns with Avanthi before widespread use.
-2. Verify each official provider and application page manually. Enter only supported claims; leave unknown optional information empty. Set lastVerified to the actual verification date and verificationStatus to `verified` only after verification.
-3. Export the relevant sheet as CSV locally into `data/incoming/` (ignored). Never commit raw research, credentials, or private notes.
-4. Run `npm ci`, then `npm run import:data -- data/incoming/export.csv`. Read `reports/validation.txt` and `reports/scholarships.candidate.json` (both ignored). CSV structural errors stop immediately with a console error. Row numbers refer to spreadsheet records starting at row 2; embedded newlines can occupy multiple physical lines.
-5. Resolve every rejection in the Sheet, re-export, and re-run. Review warnings about missing information with Avanthi. Past deadlines, future verification dates and verification older than the provisional 90-day window block imports; unknown deadlines do not become upcoming dates. The policy requires team confirmation.
-6. After human approval, run `npm run import:data -- data/incoming/export.csv --write`. With any rejected record this exits nonzero and preserves the existing public dataset. The candidate contains only valid rows for review, but partial publication is deliberately blocked. An empty, valid export can clear the dataset: review deletions before accepting.
-7. Run `npm run check`. Review the JSON diff, including deletions and official URLs. Submit a Git branch/PR for technical and content review. This is an update proposal, not publication approval.
-8. Obtain designated reviewer approval and Olivia's publication authorization before merging into any deployment-connected production branch. Preview and verify mobile behavior and external links. Follow deployment guide.
+## Repeatable update
 
-Suggested cadence pending approval: weekly checks during development and launch, then an agreed recurring manual content review. Record removals/corrections in PR descriptions and the shared operations tracker. For uncertain content remove it from the verified export pending review. Restore a prior approved dataset through a reviewed revert if an update is wrong. No local script can replace Avanthi's judgment.
+1. Update the team's Google Sheet. Confirm provider pages, full eligibility, restrictions, amounts, dates and links. Keep private/student information out of export Notes.
+2. Export Excel (.xlsx or .xlsm) or CSV. Save privately under ignored `data/incoming/`. Never execute workbook macros. No Excel or Python is required by the importer.
+3. Run `npm ci`, then `npm run import:data -- "data/incoming/export.xlsm"`. For a multi-sheet export append `--sheet "Scholarships"`. This is a dry run.
+4. Read ignored `reports/validation.txt` and `reports/research.candidate.json`. Fix rejected cells in Sheets, re-export and repeat. Review warnings about incomplete data, unknown dates, currency, link domains and possible mismatches. Structural/read failures also produce a report. No last-known-good data is overwritten on failure.
+5. Run the same command with `--write` once the export validates. This replaces **private local research only**. No public file changes. Blank rows are skipped. A header-only export can clear local research, so inspect the report and row count first.
+6. Start/restart `npm run dev`. The localhost preview shows all valid imported entries with a prominent preview banner and per-record review labels. Review full detail routes with Olivia and Avanthi. This dev server must not be exposed, tunneled or uploaded to public hosting.
+7. Run `npm run review:data -- list` to get IDs and states. An authorized content reviewer records a decision without editing TypeScript:
+
+```sh
+npm run review:data -- set RECORD-ID approved "Actual reviewer name" "Source links checked; content approved for the stated cycle"
+```
+
+For records with warnings, the command stops and prints them. Resolve the source problem first where appropriate. If an authorized reviewer has deliberately accepted the remaining warnings, rerun with `--acknowledge-warnings`. Never use a made-up reviewer name or approve simply because a Last Checked date exists. To hold a record use `needs-correction` or `pending-review` in place of `approved`, with a reason. Decisions are stored in `data/reviews.json`. No genuine approval has been entered in this implementation.
+
+8. Run `npm run generate:data`. It writes only exact-content approved entries into `src/data/scholarships.json`. With no approved records it refuses to clear an existing dataset unless `--allow-empty` is explicitly supplied. This generates content, not a deployment or publication authorization.
+9. Run `npm run check`, then `npm run build` and `npm run preview` to inspect exactly the approved public view. Review additions, changes and removals in the Git diff. Check provider links manually and mobile usability.
+10. Submit the public snapshot and review decisions on a feature branch for content/technical review. Never commit raw exports, `data/private`, or reports. Obtain Olivia's publication approval before merging/deploying through the approved hosting arrangement. Follow DEPLOYMENT.md.
+
+## Changes, rejections and rollback
+
+Any content change resets that entry to pending unless its exact hash already has an explicit decision. A previously published snapshot is preserved until deliberate regeneration; it does not silently adopt new research. To remove a previously approved record, mark its matching decision needs-correction/pending, regenerate, inspect the removal and publish the approved correction. If nothing is approved, deliberately use `npm run generate:data -- --allow-empty`. A revoked snapshot fails release validation until corrected.
+
+Imports are all-or-nothing for private replacement; reports can contain valid and rejected candidates for review, but neither a partial candidate nor a failed import overwrites the working datasets. Corrupted review JSON or mismatched content also stops generation before writing. Atomic sibling-file rename preserves the old file on write failure.
+
+Restore a prior approved JSON snapshot and its matching review evidence via reviewed Git revert for rollback. Recheck freshness before redeployment. Keep source exports in the team's agreed private shared location so another maintainer can reproduce a local preview; they are intentionally not in this repository. Suggested maintenance cadence is weekly during launch, then agree an ongoing schedule and reviewer backup with Avanthi/Olivia. Report blockers in Arjun's tracker.

@@ -1,14 +1,16 @@
-# Official technical roadmap
+# Technical roadmap
 
-Timeline remains October 26–December 6, 2026. Phase 0 is separately authorized early preparation, not an official Week 1 Technical Lead deliverable.
+Official dates remain October 26–December 6, 2026. The current request is labeled Week 2 implementation and is being completed November 9; this does not shift the official schedule or imply approvals of missed handoffs.
 
-| Week | Official dates | Technical deliverables / gates                                                                                                                                                           |
-| ---- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1    | Oct 26–Nov 1   | Other workstreams plan. No assigned Technical Lead deliverables. Phase 0 can be reviewed separately.                                                                                     |
-| 2    | Nov 2–8        | Review final scope and findings, approve stack/free limits, review foundation, confirm hosting structure, prototype with design/research owners. Resolve schema/filter/detail decisions. |
-| 3    | Nov 9–15       | Build approved main pages, browsing/search and small approved filter set; import first verified batch; review early usability feedback.                                                  |
-| 4    | Nov 16–22      | Complete approved essentials, integrate current verified dataset, fix priority issues and prepare acceptance testing.                                                                    |
-| 5    | Nov 23–29      | Test mobile/desktop, links and search; fix bugs and accessibility/usability issues; complete researcher update walkthrough.                                                              |
-| 6    | Nov 30–Dec 6   | Final fixes, approved preview/production verification, maintenance handover, explicit final publication approval and launch.                                                             |
+| Week | Dates        | Work and gates                                                                                                                                                                                                                                            |
+| ---- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | Oct 26–Nov 1 | Other workstreams plan; no official Technical Lead assignment. Separately authorized Phase 0 was prepared Oct 24.                                                                                                                                         |
+| 2    | Nov 2–8      | Foundation/stack/prototype and coordination. Current increment adds Anna-inspired pages, real private research, review workflow and checks.                                                                                                               |
+| 3    | Nov 9–15     | Review the implemented pages with Shreevidya/Anna; correct and approve Avanthi's first batch; confirm Jeet's essential filters and Olivia's scope/brand/hosting decisions. Integrate only approved filters; test real content corrections and reapproval. |
+| 4    | Nov 16–22    | Complete approved essentials, integrate current reviewed dataset, fix priority issues and prepare acceptance testing.                                                                                                                                     |
+| 5    | Nov 23–29    | Manual mobile/desktop and screen-reader testing, official link checks, content review, usability fixes, maintenance walkthrough with backup maintainer.                                                                                                   |
+| 6    | Nov 30–Dec 6 | Final fixes, approved previews/production verification, publication approval, launch and handover.                                                                                                                                                        |
 
-Week 2 priorities: obtain Arjun's tracker and Olivia's scope/hosting decisions; meet directly with Shreevidya/Anna for behavior/design and Jeet for filter findings; confirm Avanthi's columns and verification policy; review the foundation branch and run the importer together. Do not compensate for missing decisions by expanding scope. No accounts, saved listings, AI, reminders, payments, backend or unapproved tracking.
+Week 3 priorities: resolve the Elks link mismatch and other research flags; designate authorized reviewers; approve actual entries; confirm homepage identity/fonts, navigation and minimal filters; ensure private source sharing supports another maintainer; establish controlled Netlify connection only after authorization.
+
+No accounts, saved scholarships, notifications, recommendations, payments, backend or unapproved analytics enter the scope automatically.

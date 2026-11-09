@@ -1,47 +1,45 @@
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { resolve } from "node:path";
-import { parse } from "csv-parse/sync";
-import { fields, required, validateRecords } from "../src/data/schema.ts";
-const [input, ...flags] = process.argv.slice(2);
-if (!input || flags.some((f) => f !== "--write"))
-  throw new Error("Usage: npm run import:data -- path/to/export.csv [--write]");
-let headers: string[] = [];
-const rows = parse(readFileSync(input, "utf8"), {
-  bom: true,
-  skip_empty_lines: true,
-  columns: (names: string[]) => {
-    headers = names;
-    return names;
-  },
-}) as Record<string, unknown>[];
-if (new Set(headers).size !== headers.length)
-  throw new Error("Duplicate CSV headers");
-for (const key of [...required, "verificationStatus"])
-  if (!headers.includes(key)) throw new Error(`Missing column: ${key}`);
-for (const key of headers)
-  if (
-    ![...fields, "verificationStatus"].includes(key as (typeof fields)[number])
-  )
-    throw new Error(`Unknown column: ${key}`);
-const { valid, reports } = validateRecords(rows);
-mkdirSync("reports", { recursive: true });
-const report = [
-  `Input: ${resolve(input)}`,
-  `Accepted: ${valid.length}; rejected: ${rows.length - valid.length}`,
-  ...reports.map(
-    (r) =>
-      `Row ${r.row}: ${r.errors.length ? "REJECTED " + r.errors.join("; ") : "VALID"}${r.warnings.length ? " | Review: " + r.warnings.join("; ") : ""}`,
-  ),
-].join("\n");
-writeFileSync("reports/validation.txt", report + "\n");
-writeFileSync(
-  "reports/scholarships.candidate.json",
-  JSON.stringify(valid, null, 2) + "\n",
-);
-console.log(report);
-if (reports.some((r) => r.errors.length)) process.exitCode = 1;
-else if (flags.includes("--write"))
-  writeFileSync(
-    "src/data/scholarships.json",
-    JSON.stringify(valid, null, 2) + "\n",
+import { mkdirSync, writeFileSync } from "node:fs";
+import { readSource, normalizeRows } from "./lib/importer.ts";
+import { atomicWrite } from "./lib/files.ts";
+const args = process.argv.slice(2),
+  input = args.shift();
+if (!input)
+  throw new Error(
+    "Usage: npm run import:data -- export.xlsm [--sheet Scholarships] [--write]",
   );
+let write = false,
+  sheet: string | undefined;
+while (args.length) {
+  const flag = args.shift();
+  if (flag === "--write") write = true;
+  else if (flag === "--sheet" && args.length) sheet = args.shift();
+  else throw new Error(`Unknown or incomplete flag: ${flag}`);
+}
+mkdirSync("reports", { recursive: true });
+try {
+  const records = normalizeRows(await readSource(input, sheet));
+  const rejected = records.filter((r) => r.errors.length).length;
+  const report = [
+    `Records: ${records.length}. Valid: ${records.length - rejected}. Rejected: ${rejected}. All new/changed records pending review.`,
+    ...records.map(
+      (r) =>
+        `Row ${r.sourceRow}: ${r.scholarship.name}\n  ${r.errors.length ? "REJECTED: " + r.errors.join("; ") : "VALID"}\n  Review: ${r.warnings.join("; ") || "No automated flags; human review still required"}`,
+    ),
+  ].join("\n");
+  writeFileSync("reports/validation.txt", report + "\n");
+  atomicWrite("reports/research.candidate.json", records);
+  console.log(report);
+  if (rejected) process.exitCode = 1;
+  else if (write) {
+    atomicWrite("data/private/research.json", records);
+    console.log(
+      "Private research updated. Public data unchanged. Restart dev server to reload.",
+    );
+  }
+} catch (error) {
+  writeFileSync(
+    "reports/validation.txt",
+    `IMPORT FAILED: ${error instanceof Error ? error.message : String(error)}\nPrivate research and published data unchanged.\n`,
+  );
+  throw error;
+}

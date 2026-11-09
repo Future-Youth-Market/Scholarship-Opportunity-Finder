@@ -1,21 +1,40 @@
 # Architecture
 
-## Audit
+## Audit and retained work
 
-The supplied workspace was empty and not a Git checkout. The confirmed GitHub repository, Future-Youth-Market/Scholarship-Opportunity-Finder, contained only README.md and .gitignore at 34e23e9. No earlier website exists. The foundation branch retains that history and existing ignore rules.
+Phase 0 supplied React/TypeScript/Vite/Tailwind, ESLint, Vitest, an empty public dataset, a CSV validation foundation and project documentation. The Week 2 increment extends those components and tests, replacing the provisional verified-status column with the actual ten-column research template and separate review decisions. No imaginary earlier site was migrated.
 
-## Structure and flow
+## Structure
 
-`src/components` contains presentation controls and layout; `src/App.tsx` composes the single page. `src/lib/search.ts` contains pure keyword matching. `src/data/schema.ts` defines the model and shared validation. `src/data/scholarships.json` is the only public content source. `scripts` holds local import/build checks; `data` holds a header-only CSV template; `src/test` holds explicitly synthetic fixtures.
+- `src/config.ts`: configurable name and organization; no proposed name treated as approved.
+- `src/components`: layout, cards, search control, empty state, safe paragraph/bullet rendering.
+- `src/pages`: homepage, directory, scholarship details and not-found route.
+- `src/lib/search.ts`: pure keyword search and sorting, date display.
+- `src/data/schema.ts`: typed scholarship, research envelope, listing and review decision; shared field validation.
+- `scripts/lib/importer.ts`: CSV/XLSX/XLSM reading, normalization, source-quality flags and stable IDs.
+- `scripts/lib/review.ts`: content-bound review, production validation and record selection.
+- `scripts/lib/data-plugin.ts`: virtual Vite data module; never imports private data into production.
+- `data/private/research.json`: ignored unpublished research, generated locally; never in `public/` or `src/`.
+- `data/reviews.json`: human review metadata, committed only after authorization and review.
+- `src/data/scholarships.json`: approved publication snapshot; currently empty.
+- `reports/`: ignored reports and candidate data; never deployed.
 
-Research Google Sheet → local CSV → validation report and candidate JSON → human review → explicit import → reviewed Git commit → approved deployment. No direct Sheets connection or scraping. CSV parser supports quoted commas, escaped quotes, BOM and multiline text. Input values are preserved; blank optional cells are omitted. Extra columns and duplicate headers are errors. No automatic trimming, inferred dates, or currency conversions.
+## Data boundary
 
-Build-time JSON is a provisional default appropriate to a small initial dataset. No asynchronous data loading means no artificial loading state. A single page with anchor navigation needs no React Router or SPA fallback. React escapes text; URLs are restricted to HTTPS without embedded credentials. URL syntax cannot prove official ownership, safety, or availability: researchers must open and verify each link.
+Google Sheet → private export → validation report → explicit private import → human content review → exact-content decision → explicit public-data generation → checks/PR → publication approval → production build.
 
-## Stack and cost
+`npm run dev` reads local research through a virtual module and labels every page as a local research preview. It binds to 127.0.0.1. Private filesystem routes are denied. Do not tunnel or expose it publicly. `npm run build`, direct Vite builds, and Netlify Deploy Previews read only the approved snapshot and validate its content hashes against decisions. Even a build with mode=development uses approved data because the boundary uses the Vite command, not MODE/DEV flags. `npm run preview` serves that production build.
 
-React 19, TypeScript 6, Vite 8, Tailwind 4, Vitest 5 and ESLint 10 were installed and exercised together on Node 24.14.1. The official Vite scaffold selected these current versions. npm metadata checked October 24 showed recent releases and compatible Node/React requirements. Main dependencies use MIT; TypeScript uses Apache-2.0. Full resolved dependency versions are in package-lock.json. npm reported no known vulnerabilities at installation; this is a point-in-time result, not a guarantee.
+A content change invalidates approval. The old published snapshot remains a known-good version until generation replaces it; a rejected import never mutates it. Revoking a matching review decision makes that old snapshot fail release validation until regenerated. Content hashes are change-detection evidence, not digital signatures or authentication; authorized reviewers and Git review enforce the human process.
 
-Tailwind uses its official Vite plugin: https://tailwindcss.com/docs/installation/using-vite . Framework support: https://vite.dev/guide/ . Recheck dependency maintenance, engines, peer dependencies, licenses and `npm audit` before upgrades; verify changes with `npm run check`. No paid dependency or API is required. GitHub and Netlify have plan limits; see deployment guide. Do not add a database or authentication for V1.
+## Parsing and limitations
 
-Provisional safety holds reject past deadlines and verification older than 90 days. Avanthi and Olivia must approve or replace this policy. Unknown deadlines remain unknown and are never ranked as upcoming. Runtime data is compiled from validated JSON; malformed JSON/build validation stops release rather than displaying invented fallback records.
+`read-excel-file` reads zipped OOXML, including this XLSM, without Office or VBA execution. `fflate` inspects XML and rejects formulas instead of trusting cached formula output; no external links are fetched. A 10 MB compressed / 50 MB expanded import limit avoids accidental oversized workbooks. CSV parsing handles quoted commas and multiline text. Extra/duplicate columns, duplicates, invalid required fields or unsafe URLs block private replacement. Failed operations leave old private and public data intact. Files are written to a sibling temporary file and renamed into place.
+
+Dates use real YYYY-MM-DD when exact. Workbook date styles and 1900/1904 epochs are interpreted by the reader. Localized or partial date text is retained, flagged and not sorted as a known date. Numeric award text never gains an inferred currency. Notes/restrictions remain plain text. Styling and known list markers are interpreted, HTML is never injected. External URLs require HTTPS with no credentials/whitespace; syntax cannot establish official ownership or live accuracy.
+
+## Dependencies and cost
+
+New dependencies were checked against official docs and npm metadata November 9: React Router 8.5.1 (MIT, Node >=22.22; Node 24.14 is compatible), read-excel-file 9.3.14 (MIT, Node >=18), fflate (MIT), and self-hosted Fontsource OFL fonts. No server/backend, Python runtime, accounts, paid API or remote font requests. Sources: https://reactrouter.com/start/declarative/installation and https://github.com/catamphetamine/read-excel-file .
+
+An existing lint-tool minimatch advisory was resolved with a tested `minimatch ^11.0.1` override; review/remove that override when upstream lint dependencies adopt the patch. Tests and lint pass with the override. Recheck npm advisories and compatibility before updates; keep the lockfile. Build-time data remains appropriate for 13 records. There is no asynchronous loading, so no artificial loading spinner; local data errors and missing routes have explicit states. Final WCAG acceptance and researcher/provider verification remain human work.
