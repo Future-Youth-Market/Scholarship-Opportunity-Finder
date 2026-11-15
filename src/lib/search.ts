@@ -1,5 +1,5 @@
 import type { Scholarship } from "../data/schema";
-export type SortOrder = "deadline" | "name";
+export type SortOrder = "deadline" | "name" | "award-high" | "award-low";
 export function searchScholarships<T extends Scholarship>(
   data: readonly T[],
   query: string,
@@ -13,6 +13,39 @@ export function searchScholarships<T extends Scholarship>(
       .includes(term),
   );
 }
+// Only compare explicit dollar amounts. The first value in an annual breakdown
+// is the headline award; a range is compared by its upper endpoint.
+export function awardAmount(award?: string): number | undefined {
+  const match = award?.match(/^(?:up to\s+)?\$([\d,]+)(?:\s*[-–—]\s*\$([\d,]+))?(?=\s|\(|$)/i);
+  return match ? Number((match[2] ?? match[1]).replaceAll(",", "")) : undefined;
+}
+
+export function matchesCriteria(
+  scholarship: Scholarship,
+  location: string,
+  age: number | undefined,
+  minimumAward: number,
+): boolean {
+  const text = [scholarship.eligibility, scholarship.restrictions].filter(Boolean).join("\n");
+  const normalize = (value: string) => value.toLowerCase().replace(/[.]/g, "").replace(/\s+/g, " ").trim();
+  if (location.trim() && !normalize(text).includes(normalize(location))) return false;
+  if (minimumAward && (awardAmount(scholarship.award) ?? 0) < minimumAward) return false;
+  if (age === undefined) return true;
+
+  // Read explicit limits in eligibility text. Conditional restrictions such as
+  // parental consent remain on the detail page.
+  const eligibility = scholarship.eligibility ?? "";
+  const range = eligibility.match(/\bages?\s*:?\s*(\d{1,2})\s*[-–—]\s*(\d{1,2})\b/i);
+  const under = eligibility.match(/\bunder\s+(?:the age\s+(?:of\s+)?)?(\d{1,2})\b/i);
+  const younger = eligibility.match(/\b(\d{1,2})\s+or younger\b/i);
+  const older = eligibility.match(/\b(\d{1,2})\s+or older\b/i);
+  if (range && (age < Number(range[1]) || age > Number(range[2]))) return false;
+  if (under && age >= Number(under[1])) return false;
+  if (younger && age > Number(younger[1])) return false;
+  if (older && age < Number(older[1])) return false;
+  return true;
+}
+
 export function sortScholarships<T extends Scholarship>(
   data: readonly T[],
   order: SortOrder,
@@ -24,6 +57,13 @@ export function sortScholarships<T extends Scholarship>(
   const group = (s: T) => (!s.deadline ? 2 : s.deadline < today ? 1 : 0);
   return [...data].sort((a, b) => {
     if (order === "name") return name(a, b);
+    if (order === "award-high" || order === "award-low") {
+      const left = awardAmount(a.award);
+      const right = awardAmount(b.award);
+      if (left === undefined) return right === undefined ? name(a, b) : 1;
+      if (right === undefined) return -1;
+      return (order === "award-high" ? right - left : left - right) || name(a, b);
+    }
     const difference = group(a) - group(b);
     if (difference) return difference;
     if (a.deadline && b.deadline && a.deadline !== b.deadline)

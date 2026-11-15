@@ -69,7 +69,7 @@ describe("pages", () => {
   it("supports directory search, results count, clear search and sort", () => {
     view("/scholarships");
     expect(screen.getByRole("status")).toHaveTextContent("1 opportunity");
-    fireEvent.change(screen.getByRole("searchbox"), {
+    fireEvent.change(screen.getByRole("searchbox", { name: "Search scholarships" }), {
       target: { value: "unmatched" },
     });
     expect(screen.getByText("No matching scholarships")).toBeInTheDocument();
